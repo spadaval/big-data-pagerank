@@ -111,23 +111,32 @@ public class MatrixBuilder {
   public static class MatrixBuilderReducer
        extends Reducer<VertexWritable,VertexOrCountWritable,PositionPairWritable,FloatWritable> {
 
-    private ArrayList<VertexWritable> i_vertices = new ArrayList<VertexWritable>();
+    private ArrayList<VertexWritable> iVertices = new ArrayList<VertexWritable>();
     private int edgeCount;
     private boolean edgeCountEncountered;
 
-    public void reduce(VertexWritable j_vertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
-                          for(VertexOrCountWritable v:values){
-                            if(v instanceof VertexWritable){
-                              VertexWritable x = (VertexWritable)(v);
-                              if(edgeCountEncountered){
-                                context.write(new PositionPairWritable(j_vertex.get(),x.get()));
-                              }
-                              else{
-                                i_vertices.add(x);
-                              }
-                                
-                            }
-                          }
+    private void flushBuffer(Context context){
+      for(VertexWritable v: iVertices)
+        context.write(new PositionPairWritable(jVertex.get(),v.get()),new FloatWritable(1/this.edgeCount));
+    }
+    //Input a Interable of either destination vertex or edgecount (for the given source vertex)
+    public void reduce(VertexWritable jVertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
+      for(VertexOrCountWritable v:values){
+        if(v instanceof VertexWritable){
+          VertexWritable x = (VertexWritable)(v);
+          if(edgeCountEncountered){
+            context.write(new PositionPairWritable(jVertex.get(),x.get()),new FloatWritable(1/this.edgeCount));
+          }
+          else{
+            iVertices.add(x);
+          }
+        }
+        else{ //type CountWritable
+          this.edgeCountEncountered = true;
+          this.edgeCount = x.get();
+          this.flushBuffer(jVertex,context);
+        }
+      }
     }
   }
 
