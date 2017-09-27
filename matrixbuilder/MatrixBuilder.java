@@ -23,34 +23,111 @@ import org.apache.hadoop.util.StringUtils;
 
 public class MatrixBuilder {
 
-  public static class MatrixBuilderMapper
-       extends Mapper<Object, Text, Text, IntWritable>{
+  public static class VertexWritable extends IntWritable{
+    VertexWritable(){
+      super();
+    }
+  }
 
-    static enum CountersEnum { INPUT_WORDS }
+  public static class CountWritable extends IntWritable{
+    CountWritable(){
+      super();
+    }
+  }
 
-    private final static IntWritable one = new IntWritable(1);
-    private Text word = new Text();
+  public static class VertexOrCountWritable extends GenericWritable{
+    private static Class[] CLASSES = {VertexWritable.class,CountWritable.class};
+    protected static Class[] getTypes(){
+      return CLASSES;
+    }
+  }
+
+  public static class PositionPairWritable implements WritableComparable{
+    // Some data
+       private int i;
+       private long j;
+
+       PositionPairWritable(int i, int j){
+         this.i = i;
+         this.j = j;
+       }
+
+       public void write(DataOutput out) throws IOException {
+         out.writeInt(i);
+         out.writeInt(j);
+       }
+
+       public void readFields(DataInput in) throws IOException {
+         i = in.readInt();
+         j = in.readInt();
+       }
+
+       public int compareTo(PositionPairWritable o) {
+        if(this.i<o.i)
+          return -1;
+        else if(this.i>o.i)
+            return 1;
+          else if(this.j<o.j)
+              return -1;
+            else if(this.j>o.j)
+                return 1;
+              else if(this.i==o.i && this.j==o.j)return 0;
+       }
+
+       public int hashCode() {
+         final int prime = 31;
+         int result = 1;
+         result = prime * result + j;
+         result = prime * result + (int) (i ^ (i >>> 32));
+         return result;
+       }
+  }
+
+
+  public static class EdgeMapper
+       extends Mapper<VertexWritable, VertexWritable, VertexWritable, VertexWritable>{
 
     private Configuration conf;
-    private BufferedReader fis;
 
     @Override
-    public void setup(Context context) throws IOException,
-        InterruptedException {
-    }
-
-    @Override
-    public void map(Object key, Text value, Context context
+    public void map(VertexWritable key, VertexWritable value, Context context
                     ) throws IOException, InterruptedException {
+                      context.write(key,value); //echo
+    }
+  }
+
+  public static class EdgeCountMapper
+       extends Mapper<VertexWritable, CountWritable, VertexWritable, CountWritable>{
+
+    private Configuration conf;
+
+    @Override
+    public void map(VertexWritable key, VertexWritable value, Context context
+                    ) throws IOException, InterruptedException {
+                      context.write(key,value); //echo
     }
   }
 
   public static class MatrixBuilderReducer
-       extends Reducer<Text,IntWritable,Text,IntWritable> {
-    private IntWritable result = new IntWritable();
+       extends Reducer<VertexWritable,VertexOrCountWritable,PositionPairWritable,FloatWritable> {
 
-    public void reduce(Text key, Iterable<IntWritable> values, Context context)
-                        throws IOException, InterruptedException {
+    private ArrayList<VertexWritable> i_vertices = new ArrayList<VertexWritable>();
+    private int edgeCount;
+    private boolean edgeCountEncountered;
+
+    public void reduce(VertexWritable j_vertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
+                          for(VertexOrCountWritable v:values){
+                            if(v instanceof VertexWritable){
+                              VertexWritable x = (VertexWritable)(v);
+                              if(edgeCountEncountered){
+                                context.write(new PositionPairWritable(j_vertex.get(),x.get()));
+                              }
+                              else{
+                                i_vertices.add(x);
+                              }
+                                
+                            }
+                          }
     }
   }
 
@@ -59,14 +136,14 @@ public class MatrixBuilder {
 
     Job job = Job.getInstance(conf, "word count");
     job.setJarByClass(MatrixBuilder.class);
-    job.setMapperClass(MatrixBuilderMapper.class);
-    job.setCombinerClass(MatrixBuilderReducer.class);
     job.setReducerClass(MatrixBuilderReducer.class);
     job.setOutputKeyClass(IntWritable.class);
     job.setOutputValueClass(IntWritable.class);
 
     //FileInputFormat.addInputPath(job, new Path());
-    //FileOutputFormat.setOutputPath(job, new Path());
+    MultipleInputs.addInputPath(job,new Path("/Files/EdgeCount",EdgeCountFileMapper.class));
+    MultipleInputs.addInputPath(job,new Path("/Input/edges",EdgeMapper.class));
+    FileOutputFormat.setOutputPath(job, new Path("/Output/A"));
 
     System.exit(job.waitForCompletion(true) ? 0 : 1);
   }
