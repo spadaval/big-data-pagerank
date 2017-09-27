@@ -20,6 +20,9 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.StringUtils;
+//Fancy stuff
+import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
+import org.apache.hadoop.io.GenericWritable;
 
 public class MatrixBuilder {
 
@@ -34,7 +37,7 @@ public class MatrixBuilder {
       super();
     }
   }
-
+  //wrapper class for inputs to the reducer
   public static class VertexOrCountWritable extends GenericWritable{
     private static Class[] CLASSES = {VertexWritable.class,CountWritable.class};
     protected static Class[] getTypes(){
@@ -65,7 +68,7 @@ public class MatrixBuilder {
        public int compareTo(PositionPairWritable o) {
         if(this.i<o.i)
           return -1;
-        else if(this.i>o.i)
+        else if(this.i>o. i)
             return 1;
           else if(this.j<o.j)
               return -1;
@@ -115,17 +118,17 @@ public class MatrixBuilder {
     private int edgeCount;
     private boolean edgeCountEncountered;
 
-    private void flushBuffer(Context context){
-      for(VertexWritable v: iVertices)
-        context.write(new PositionPairWritable(jVertex.get(),v.get()),new FloatWritable(1/this.edgeCount));
+    private void flushBuffer(VertexWritable iVertex,Context context){
+      for(VertexWritable jVertex: iVertices)
+        context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1/this.edgeCount));
     }
     //Input a Interable of either destination vertex or edgecount (for the given source vertex)
-    public void reduce(VertexWritable jVertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
+    public void reduce(VertexWritable iVertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
       for(VertexOrCountWritable v:values){
         if(v instanceof VertexWritable){
-          VertexWritable x = (VertexWritable)(v);
+          VertexWritable jVertex = (VertexWritable)(v);
           if(edgeCountEncountered){
-            context.write(new PositionPairWritable(jVertex.get(),x.get()),new FloatWritable(1/this.edgeCount));
+            context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1/this.edgeCount));
           }
           else{
             iVertices.add(x);
@@ -133,11 +136,13 @@ public class MatrixBuilder {
         }
         else{ //type CountWritable
           this.edgeCountEncountered = true;
-          this.edgeCount = x.get();
-          this.flushBuffer(jVertex,context);
+          CountWritable temp = (CountWritable)(x);
+          this.edgeCount = temp.get();
+          this.flushBuffer(iVertex,context);
         }
       }
     }
+
   }
 
   public static void main(String[] args) throws Exception {
