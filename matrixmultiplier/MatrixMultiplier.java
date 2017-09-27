@@ -20,19 +20,18 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.StringUtils;
+//add multiple files
+import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
+import org.apache.hadoop.io.GenericWritable;
 
-public class WordCount2 {
+public class MatrixMultiplier {
 
   public static class MatrixMultiplierMapper
        extends Mapper<Object, Text, Text, IntWritable>{
 
-    static enum CountersEnum { INPUT_WORDS }
-
     private final static IntWritable one = new IntWritable(1);
-    private Text word = new Text();
 
     private Configuration conf;
-    private BufferedReader fis;
 
     @Override
     public void setup(Context context) throws IOException,
@@ -59,8 +58,6 @@ public class WordCount2 {
 
     Job job = Job.getInstance(conf, "word count");
     job.setJarByClass(MatrixMultiplier.class);
-    job.setMapperClass(MatrixMultiplierMapper.class);
-    job.setCombinerClass(MatrixMultiplierReducer.class);
     job.setReducerClass(MatrixMultiplierReducer.class);
     job.setOutputKeyClass(IntWritable.class);
     job.setOutputValueClass(IntWritable.class);
