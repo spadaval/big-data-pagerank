@@ -36,29 +36,29 @@ import org.apache.hadoop.util.GenericOptionsParser;
 public class MatrixBuilderReducer
      extends Reducer<VertexWritable,VertexOrCountWritable,PositionPairWritable,FloatWritable> {
 
-  private ArrayList<VertexWritable> iVertices = new ArrayList<VertexWritable>();
+  private ArrayList<VertexWritable> buffer = new ArrayList<VertexWritable>();
   private int edgeCount;
   private boolean edgeCountEncountered;
 
   private void flushBuffer(VertexWritable iVertex,Context context){
-    for(VertexWritable jVertex: iVertices)
+    for(VertexWritable jVertex: buffer)
       context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1/this.edgeCount));
   }
   //Input a Interable of either destination vertex or edgecount (for the given source vertex)
   public void reduce(VertexWritable iVertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
     for(VertexOrCountWritable v:values){
       if(v instanceof VertexWritable){
-        VertexWritable jVertex = (VertexWritable)(v);
+        VertexWritable jVertex = (VertexWritable)(v.get());
         if(edgeCountEncountered){
           context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1/this.edgeCount));
         }
         else{
-          iVertices.add(x);
+          buffer.add(jVertex);
         }
       }
       else{ //type CountWritable
         this.edgeCountEncountered = true;
-        CountWritable temp = (CountWritable)(x);
+        CountWritable temp = (CountWritable)(x.get());
         this.edgeCount = temp.get();
         this.flushBuffer(iVertex,context);
       }
