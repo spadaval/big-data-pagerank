@@ -40,7 +40,7 @@ public class MatrixBuilderReducer
   private long edgeCount;
   private boolean edgeCountEncountered;
 
-  private void flushBuffer(VertexWritable iVertex,Context context)throws IOException{
+  private void flushBuffer(VertexWritable iVertex,Context context)throws IOException,InterruptedException{
     for(VertexWritable jVertex: buffer)
       context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1/this.edgeCount));
   }
