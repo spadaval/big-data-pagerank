@@ -37,7 +37,7 @@ public class MatrixBuilderReducer
      extends Reducer<VertexWritable,VertexOrCountWritable,PositionPairWritable,FloatWritable> {
 
   private ArrayList<VertexWritable> buffer = new ArrayList<VertexWritable>();
-  private int edgeCount;
+  private long edgeCount;
   private boolean edgeCountEncountered;
 
   private void flushBuffer(VertexWritable iVertex,Context context){

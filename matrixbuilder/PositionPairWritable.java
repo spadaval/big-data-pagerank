@@ -74,10 +74,10 @@ public class PositionPairWritable implements WritableComparable{
      }
 
      public int hashCode() {
-       final int prime = 31;
-       int result = 1;
+       final long prime = 31;
+       long result = 1;
        result = prime * result + j;
        result = prime * result + (int) (i ^ (i >>> 32));
-       return result;
+       return (int)result;
      }
 }
