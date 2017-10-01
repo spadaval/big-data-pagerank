@@ -1,5 +1,5 @@
 #!/bin/bash
-hadoop fs -rmr /pagerank/edgecount
+hadoop fs -rmr /pagerank/Files/EdgeCount
 
 #edge_counter
-hadoop jar wc.jar WordCount /pagerank/File/inp01.txt /pagerank/File/edgecount/
+hadoop jar wc.jar WordCount 
