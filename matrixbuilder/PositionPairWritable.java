@@ -61,16 +61,17 @@ public class PositionPairWritable implements WritableComparable{
 
       if(this.i<o.i)
         return -1;
-      if(this.i>o.i)
+      else if(this.i>o.i)
         return 1;
-      if(this.i==o.i && this.j==o.j){
+      else if(this.i==o.i && this.j==o.j){
         if(this.j>o.j)
           return 1;
-        if(this.j<o.j)
+        else if(this.j<o.j)
           return -1;
-        if(this.j==o.j)
+        else if(this.j==o.j)
           return 0;
       }
+      return 0;
      }
 
      public int hashCode() {
