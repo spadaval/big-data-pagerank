@@ -5,7 +5,7 @@ import java.io.*;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -47,7 +47,7 @@ public class MatrixBuilderReducer
   //Input a Interable of either destination vertex or edgecount (for the given source vertex)
   public void reduce(VertexWritable iVertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
     for(VertexOrCountWritable v:values){
-      if(v instanceof VertexWritable){
+      if(v.get() instanceof VertexWritable){
         VertexWritable jVertex = (VertexWritable)(v.get());
         if(edgeCountEncountered){
           context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1/this.edgeCount));
@@ -58,7 +58,7 @@ public class MatrixBuilderReducer
       }
       else{ //type CountWritable
         this.edgeCountEncountered = true;
-        CountWritable temp = (CountWritable)(x.get());
+        CountWritable temp = (CountWritable)(v.get());
         this.edgeCount = temp.get();
         this.flushBuffer(iVertex,context);
       }

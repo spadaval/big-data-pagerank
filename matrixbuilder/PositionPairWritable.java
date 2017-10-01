@@ -5,7 +5,7 @@ import java.io.*;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -35,34 +35,42 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 public class PositionPairWritable implements WritableComparable{
   // Some data
-     private int i;
+     private long i;
      private long j;
 
-     PositionPairWritable(int i, int j){
+     PositionPairWritable(long i, long j){
        this.i = i;
        this.j = j;
      }
 
      public void write(DataOutput out) throws IOException {
-       out.writeInt(i);
-       out.writeInt(j);
+       out.writeLong(i);
+       out.writeLong(j);
      }
 
      public void readFields(DataInput in) throws IOException {
-       i = in.readInt();
-       j = in.readInt();
+       i = in.readLong();
+       j = in.readLong();
      }
+     @Override
+     public int compareTo(Object object) {
+      if(!(object instanceof PositionPairWritable))
+        return -1;
 
-     public int compareTo(PositionPairWritable o) {
+      PositionPairWritable o = (PositionPairWritable)object;
+
       if(this.i<o.i)
         return -1;
-      else if(this.i>o. i)
+      if(this.i>o.i)
+        return 1;
+      if(this.i==o.i && this.j==o.j){
+        if(this.j>o.j)
           return 1;
-        else if(this.j<o.j)
-            return -1;
-          else if(this.j>o.j)
-              return 1;
-            else if(this.i==o.i && this.j==o.j)return 0;
+        if(this.j<o.j)
+          return -1;
+        if(this.j==o.j)
+          return 0;
+      }
      }
 
      public int hashCode() {

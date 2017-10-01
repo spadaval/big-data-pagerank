@@ -5,7 +5,7 @@ import java.io.*;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -35,7 +35,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 public class VertexOrCountWritable extends GenericWritable{
   private static Class[] CLASSES = {VertexWritable.class,CountWritable.class};
-  protected static Class[] getTypes(){
+  protected Class[] getTypes(){
     return CLASSES;
   }
 }
