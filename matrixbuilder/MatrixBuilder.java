@@ -5,7 +5,7 @@ import java.io.*;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -41,8 +41,8 @@ public class MatrixBuilder extends Configured implements Tool{
     Job job = Job.getInstance(conf, "word count");
     job.setJarByClass(MatrixBuilder.class);
     job.setReducerClass(MatrixBuilderReducer.class);
-    job.setOutputKeyClass(IntWritable.class);
-    job.setOutputValueClass(IntWritable.class);
+    job.setOutputKeyClass(LongWritable.class);
+    job.setOutputValueClass(LongWritable.class);
 
     //FileInputFormat.addInputPath(job, new Path());
     MultipleInputs.addInputPath(job,new Path("/Files/EdgeCount"),EdgeCountMapper.class);

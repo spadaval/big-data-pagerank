@@ -4,7 +4,7 @@ import java.io.*;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -34,7 +34,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 public class multiply extends Configured implements Tool
 {
-	public static class CounterMapper extends Mapper<LongWritable, Text, Text, IntWritable>
+	public static class CounterMapper extends Mapper<LongWritable, Text, Text, LongWritable>
 	{
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
 		{
@@ -50,13 +50,13 @@ public class multiply extends Configured implements Tool
 				for(i=1;i<=2;i++)
 				{
 					itr = i;
-					context.write(new Text((new IntWritable(a)).toString()+","+Integer.toString(itr)+","+(new IntWritable(b)).toString()), new IntWritable(v));
+					context.write(new Text((new LongWritable(a)).toString()+","+Integer.toString(itr)+","+(new LongWritable(b)).toString()), new LongWritable(v));
 				}
 			}
 		}
 	}
 
-	public static class CountertwoMapper extends Mapper<LongWritable, Text, Text, IntWritable>
+	public static class CountertwoMapper extends Mapper<LongWritable, Text, Text, LongWritable>
 	{
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
 		{
@@ -72,21 +72,21 @@ public class multiply extends Configured implements Tool
 				for(i=1;i<=2;i++)
 				{
 					itr = i;
-					context.write(new Text(Integer.toString(itr)+","+(new IntWritable(b)).toString()+","+(new IntWritable(a)).toString()), new IntWritable(v));
+					context.write(new Text(Integer.toString(itr)+","+(new LongWritable(b)).toString()+","+(new LongWritable(a)).toString()), new LongWritable(v));
 				}
 			}
 		}
 	}
 
-	public static class CounterReducer extends Reducer<Text, IntWritable, Text, IntWritable>
+	public static class CounterReducer extends Reducer<Text, LongWritable, Text, LongWritable>
 	{
 		String line=null;
 
-		public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException
+		public void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException
 		{
 			int sum = 1;
 			int count = 0;
-			for (IntWritable val : values)
+			for (LongWritable val : values)
 			{
 				sum *= val.get();
 				count += 1;
@@ -95,7 +95,7 @@ public class multiply extends Configured implements Tool
 			if(count>1)
 			{
 				List<String> k = Arrays.asList(key.toString().split(","));
-				context.write(new Text(k.get(0)+","+k.get(1)), new IntWritable(sum));
+				context.write(new Text(k.get(0)+","+k.get(1)), new LongWritable(sum));
 			}
 		}
 	}
@@ -114,10 +114,10 @@ public class multiply extends Configured implements Tool
 		 job.setReducerClass(CounterReducer.class);
 		 job.setNumReduceTasks(1);
 		 job.setMapOutputKeyClass(Text.class);
-		 //job.setMapOutputValueClass(IntWritable.class);
+		 //job.setMapOutputValueClass(LongWritable.class);
 		 //job.setOutputKeyClass(Text.class);
 		 job.setOutputKeyClass(LongWritable.class);
-		 job.setOutputValueClass(IntWritable.class);
+		 job.setOutputValueClass(LongWritable.class);
 
 		 return (job.waitForCompletion(true) ? 0 : 1);
 
@@ -125,7 +125,7 @@ public class multiply extends Configured implements Tool
 
  	public static void main(String[] args) throws Exception
  	{
- 		
+
 		int ecode = ToolRunner.run(new multiply(),args);
 		System.exit(ecode);
 
@@ -135,7 +135,7 @@ public class multiply extends Configured implements Tool
 		 MultipleInputs.addInputPath(job,new Path("/Input2"),TextInputFormat.class,CountertwoMapper.class);
 		conf.setJobName("web");
 		conf.setOutputKeyClass(Text.class);
-		conf.setOutputValueClass(IntWritable.class);
+		conf.setOutputValueClass(LongWritable.class);
 		conf.setMapperClass(Map.class);
 		conf.setCombinerClass(Reduce.class);
 		conf.setReducerClass(Reduce.class);
