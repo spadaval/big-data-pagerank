@@ -45,8 +45,8 @@ public class MatrixBuilder extends Configured implements Tool{
     job.setOutputValueClass(IntWritable.class);
 
     //FileInputFormat.addInputPath(job, new Path());
-    MultipleInputs.addInputPath(job,new Path("/Files/EdgeCount",EdgeCountFileMapper.class));
-    MultipleInputs.addInputPath(job,new Path("/Input/edges",EdgeMapper.class));
+    MultipleInputs.addInputPath(job,new Path("/Files/EdgeCount"),EdgeCountMapper.class);
+    MultipleInputs.addInputPath(job,new Path("/Input/edges"),EdgeMapper.class);
     FileOutputFormat.setOutputPath(job, new Path("/Output/A"));
 
     return (job.waitForCompletion(true) ? 0 : 1);
