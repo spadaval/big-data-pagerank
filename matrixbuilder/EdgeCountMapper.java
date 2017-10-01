@@ -39,7 +39,7 @@ public class EdgeCountMapper
   private Configuration conf;
 
   @Override
-  public void map(VertexWritable key, VertexWritable value, Context context
+  public void map(VertexWritable key, CountWritable value, Context context
                   ) throws IOException, InterruptedException {
                     context.write(key,value); //echo
   }
