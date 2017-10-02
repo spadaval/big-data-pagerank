@@ -1,4 +1,4 @@
-package edgecount;
+//package edgecount;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
@@ -12,11 +12,11 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class SumReducer
-     extends Reducer<Text,LongWritable,Text,LongWritable> {
+     extends Reducer<LongWritable,LongWritable,LongWritable,LongWritable> {
   private LongWritable result = new LongWritable();
 
-  public void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
-    int sum = 0;
+  public void reduce(LongWritable key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
+    long sum = 0;
     for (LongWritable val : values) {
       sum += val.get();
     }

@@ -1,4 +1,4 @@
-package edgecount;
+//package edgecount;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
@@ -24,7 +24,7 @@ public class EdgeCount extends Configured implements Tool{
     job.setMapperClass(CounterMapper.class);
     job.setCombinerClass(SumReducer.class);
     job.setReducerClass(SumReducer.class);
-    job.setOutputKeyClass(Text.class);
+    job.setOutputKeyClass(LongWritable.class);
     job.setOutputValueClass(LongWritable.class);
     FileInputFormat.addInputPath(job, new Path("/pagerank/Input/Edges"));
     FileOutputFormat.setOutputPath(job,new Path("/pagerank/Files/EdgeCount"));
