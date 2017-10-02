@@ -1,5 +1,6 @@
 #!/bin/bash
+#clean up the current edgecount file
 hadoop fs -rmr /pagerank/Files/EdgeCount
 
-#edge_counter
-hadoop jar wc.jar WordCount 
+#run the job
+hadoop jar edgecount.jar EdgeCount

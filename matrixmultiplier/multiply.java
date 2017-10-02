@@ -113,7 +113,7 @@ public class multiply extends Configured implements Tool
 		 MultipleInputs.addInputPath(job,new Path("/pagerank/Output/A"),TextInputFormat.class,CounterMapper.class);
 		 MultipleInputs.addInputPath(job,new Path("/pagerank/Output/V"),TextInputFormat.class,CountertwoMapper.class);
 
-		 FileOutputFormat.setOutputPath(job, new Path("/pagerank/Files/IntermediateOutput"));
+		 FileOutputFormat.setOutputPath(job, new Path("/pagerank/Files/Output1"));
 		 job.setReducerClass(CounterReducer.class);
 		 job.setNumReduceTasks(1);
 		 job.setMapOutputKeyClass(Text.class);

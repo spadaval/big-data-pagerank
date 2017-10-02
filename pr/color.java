@@ -56,7 +56,7 @@ public class color
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
 
-		FileInputFormat.setInputPaths(conf, new Path("/pagerank/Files/IntermediateOutput"));
+		FileInputFormat.setInputPaths(conf, new Path("/pagerank/Files/Output1"));
 		FileOutputFormat.setOutputPath(conf, new Path("/pagerank/Output/NewV"));
 
 
