@@ -1,5 +1,4 @@
-package matrixbuilder;
-//import mutipleInput.Join;
+
 import java.util.*;
 import java.io.*;
 
@@ -34,13 +33,17 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 public class EdgeCountMapper
-     extends Mapper<VertexWritable, CountWritable, VertexWritable, CountWritable>{
+     extends Mapper<LongWritable, Text, VertexWritable, VertexOrCountWritable>{
 
   private Configuration conf;
+  private VertexWritable v = new VertexWritable();
+  private CountWritable c = new CountWritable();
 
   @Override
-  public void map(VertexWritable key, CountWritable value, Context context
-                  ) throws IOException, InterruptedException {
-                    context.write(key,value); //echo
+  public void map(LongWritable f, Text value, Context context) throws IOException, InterruptedException {
+    Scanner s = new Scanner(value.toString());
+    v.set(s.nextLong());
+    c.set(s.nextLong());
+    context.write(v,new VertexOrCountWritable(c));
   }
 }

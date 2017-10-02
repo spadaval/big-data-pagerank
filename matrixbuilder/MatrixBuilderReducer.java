@@ -1,5 +1,4 @@
-package matrixbuilder;
-//import mutipleInput.Join;
+
 import java.util.*;
 import java.io.*;
 
@@ -42,7 +41,7 @@ public class MatrixBuilderReducer
 
   private void flushBuffer(VertexWritable iVertex,Context context)throws IOException,InterruptedException{
     for(VertexWritable jVertex: buffer)
-      context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1/this.edgeCount));
+      context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1.0f/this.edgeCount));
   }
   //Input a Interable of either destination vertex or edgecount (for the given source vertex)
   public void reduce(VertexWritable iVertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
@@ -50,7 +49,7 @@ public class MatrixBuilderReducer
       if(v.get() instanceof VertexWritable){
         VertexWritable jVertex = (VertexWritable)(v.get());
         if(edgeCountEncountered){
-          context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1/this.edgeCount));
+          context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1.0f/this.edgeCount));
         }
         else{
           buffer.add(jVertex);

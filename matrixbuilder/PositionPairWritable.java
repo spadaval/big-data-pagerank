@@ -1,5 +1,4 @@
-package matrixbuilder;
-//import mutipleInput.Join;
+
 import java.util.*;
 import java.io.*;
 
@@ -59,19 +58,18 @@ public class PositionPairWritable implements WritableComparable{
 
       PositionPairWritable o = (PositionPairWritable)object;
 
-      if(this.i<o.i)
+      if(this.j<o.j)
         return -1;
-      else if(this.i>o.i)
+      else if(this.j>o.j)
         return 1;
-      else if(this.i==o.i && this.j==o.j){
-        if(this.j>o.j)
+      else{
+        if(this.i>o.i)
           return 1;
-        else if(this.j<o.j)
+        else if(this.i<o.i)
           return -1;
-        else if(this.j==o.j)
+        else
           return 0;
       }
-      return 0;
      }
 
      public int hashCode() {
@@ -80,5 +78,9 @@ public class PositionPairWritable implements WritableComparable{
        result = prime * result + j;
        result = prime * result + (int) (i ^ (i >>> 32));
        return (int)result;
+     }
+     @Override
+     public String toString(){
+       return String.format("%d %d",i,j);
      }
 }

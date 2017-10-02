@@ -1,5 +1,4 @@
-package matrixbuilder;
-//import mutipleInput.Join;
+
 import java.util.*;
 import java.io.*;
 
@@ -34,8 +33,23 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 public class VertexOrCountWritable extends GenericWritable{
-  private static Class[] CLASSES = {VertexWritable.class,CountWritable.class};
+  private static Class[] CLASSES = {
+    VertexWritable.class,
+    CountWritable.class
+  };
+
+  VertexOrCountWritable(){
+
+  }
+  VertexOrCountWritable(Writable i){
+    set(i);
+  }
+
   protected Class[] getTypes(){
     return CLASSES;
   }
+  @Override
+   public String toString() {
+       return "VertexOrCountWritable [getTypes()=" + Arrays.toString(getTypes()) + "]";
+   }
 }

@@ -1,5 +1,4 @@
-package matrixbuilder;
-//import mutipleInput.Join;
+
 import java.util.*;
 import java.io.*;
 
@@ -38,17 +37,19 @@ public class MatrixBuilder extends Configured implements Tool{
   public int run(String[] args) throws Exception{
     Configuration conf = new Configuration();
 
-    Job job = Job.getInstance(conf, "word count");
+    Job job = Job.getInstance(conf);
     job.setJarByClass(MatrixBuilder.class);
     job.setReducerClass(MatrixBuilderReducer.class);
-    job.setOutputKeyClass(LongWritable.class);
-    job.setOutputValueClass(LongWritable.class);
+    job.setOutputKeyClass(VertexWritable.class);
+    job.setOutputValueClass(VertexOrCountWritable.class);
+
+    conf.set("mapreduce.input.fileinputformat.input.dir.recursive","true");
+    FileInputFormat.setInputDirRecursive(job, true);
 
     //FileInputFormat.addInputPath(job, new Path());
-    MultipleInputs.addInputPath(job,new Path("/Files/EdgeCount"),TextInputFormat.class,EdgeCountMapper.class);
-    MultipleInputs.addInputPath(job,new Path("/Input/Edges"),TextInputFormat.class,EdgeMapper.class);
-    FileOutputFormat.setOutputPath(job, new Path("/Output/A"));
-
+    MultipleInputs.addInputPath(job,new Path("/pagerank/Files/EdgeCount"),TextInputFormat.class,EdgeCountMapper.class);
+    MultipleInputs.addInputPath(job,new Path("/pagerank/Input/Edges"),TextInputFormat.class,EdgeMapper.class);
+    FileOutputFormat.setOutputPath(job, new Path("/pagerank/Output/A"));
     return (job.waitForCompletion(true) ? 0 : 1);
   }
 
