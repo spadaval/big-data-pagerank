@@ -36,30 +36,31 @@ public class MatrixBuilderReducer
      extends Reducer<VertexWritable,VertexOrCountWritable,PositionPairWritable,FloatWritable> {
 
   private ArrayList<VertexWritable> buffer = new ArrayList<VertexWritable>();
-  private long edgeCount;
-  private boolean edgeCountEncountered;
 
-  private void flushBuffer(VertexWritable iVertex,Context context)throws IOException,InterruptedException{
+  private void flushBuffer(VertexWritable iVertex,FloatWritable weightage,Context context)throws IOException,InterruptedException{
     for(VertexWritable jVertex: buffer)
-      context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1.0f/this.edgeCount));
+      context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),weightage);
   }
   //Input a Interable of either destination vertex or edgecount (for the given source vertex)
   public void reduce(VertexWritable iVertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
+    FloatWritable weightage = new FloatWritable();
+    boolean edgeCountEncountered = false;
+
     for(VertexOrCountWritable v:values){
       if(v.get() instanceof VertexWritable){
         VertexWritable jVertex = (VertexWritable)(v.get());
-        if(edgeCountEncountered){
-          context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),new FloatWritable(1.0f/this.edgeCount));
+        if(edgeCountEncountered){ //normal operation, write out a pair
+          context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),weightage);
         }
-        else{
+        else{ // We don't know the weightage yet, add to a buffer
           buffer.add(jVertex);
         }
       }
-      else{ //type CountWritable
-        this.edgeCountEncountered = true;
+      else{ //type CountWritable, we've found the count, flush the buffer
+        edgeCountEncountered = true;
         CountWritable temp = (CountWritable)(v.get());
-        this.edgeCount = temp.get();
-        this.flushBuffer(iVertex,context);
+        weightage.set(1.0f/((float)temp.get()));
+        this.flushBuffer(iVertex,weightage,context);
       }
     }
   }
