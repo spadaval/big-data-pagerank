@@ -11,7 +11,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-public static class SumReducer
+public class SumReducer
      extends Reducer<Text,LongWritable,Text,LongWritable> {
   private LongWritable result = new LongWritable();
 

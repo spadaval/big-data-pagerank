@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-public static class SumReducer
+public class SumReducer
      extends Reducer<LongWritable,LongWritable,NullWritable,LongWritable> {
   private LongWritable result = new LongWritable();
 
@@ -22,6 +22,6 @@ public static class SumReducer
       sum += val.get();
     }
     result.set(sum);
-    context.write(new NullWritable(), result);
+    context.write(NullWritable.get(), result);
   }
 }

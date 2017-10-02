@@ -1,3 +1,4 @@
+package edgecount;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
@@ -9,16 +10,20 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 
-public class EdgeCount {
+public class EdgeCount extends Configured implements Tool{
 
   public int run(String[] args) throws Exception{
     Configuration conf = new Configuration();
     Job job = Job.getInstance(conf, "word count");
     job.setJarByClass(EdgeCount.class);
-    job.setMapperClass(TokenizerMapper.class);
-    job.setCombinerClass(IntSumReducer.class);
-    job.setReducerClass(IntSumReducer.class);
+    job.setMapperClass(CounterMapper.class);
+    job.setCombinerClass(SumReducer.class);
+    job.setReducerClass(SumReducer.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(LongWritable.class);
     FileInputFormat.addInputPath(job, new Path("/pagerank/Input/Edges"));
@@ -28,6 +33,6 @@ public class EdgeCount {
 
   public static void main(String[] args) throws Exception {
     int ecode = ToolRunner.run(new EdgeCount(),args);
-    return ecode;
+    System.exit(ecode);
   }
 }

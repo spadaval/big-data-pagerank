@@ -1,11 +1,22 @@
 #!/bin/sh
 #preliminary tasks
-edgecount/build.sh
-vertexcount/build.sh
+cd edgecount
+./build.sh
+cd ..
+
+cd vertexcount
+./build.sh
+cd ..
 
 #create the matrix A
-matrixbuilder/build.sh
-
+cd matrixbuilder
+./build.sh
+cd ..
 #multiply the matrix A and vector V
-matrixmultiplier/build.sh
-pr/build.sh
+cd matrixmultiplier
+./build.sh
+cd ..
+
+cd pr
+./build.sh
+cd ..
