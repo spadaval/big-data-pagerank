@@ -1,5 +1,3 @@
-package vertexcount;
-
 import java.io.IOException;
 import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
@@ -15,6 +13,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.io.NullWritable;
 
 public class VertexCount extends Configured implements Tool{
 
@@ -22,13 +21,16 @@ public class VertexCount extends Configured implements Tool{
     Configuration conf = new Configuration();
     Job job = Job.getInstance(conf, "word count");
     job.setJarByClass(VertexCount.class);
-    job.setMapperClass(CounterMapper.class);
-    job.setCombinerClass(SumReducer.class);
+    job.setMapperClass(CounterVertexCountMapper.class);
     job.setReducerClass(SumReducer.class);
-    job.setOutputKeyClass(Text.class);
+
+    job.setMapOutputKeyClass(LongWritable.class);
+    job.setMapOutputValueClass(LongWritable.class);
+    job.setOutputKeyClass(NullWritable.class);
     job.setOutputValueClass(LongWritable.class);
+
     FileInputFormat.addInputPath(job, new Path("/pagerank/Input/Vertices"));
-    FileOutputFormat.setOutputPath(job,new Path("/pagerank/Files/VertexCount"));
+    FileOutputFormat.setOutputPath(job, new Path("/pagerank/Files/VertexCount"));
     return (job.waitForCompletion(true) ? 0 : 1);
   }
 

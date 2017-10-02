@@ -33,17 +33,17 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 public class MatrixBuilderReducer
-     extends Reducer<VertexWritable,VertexOrCountWritable,PositionPairWritable,FloatWritable> {
+     extends Reducer<VertexWritable,VertexOrCountWritable,PositionPairWritable,LongWritable> {
 
   private ArrayList<VertexWritable> buffer = new ArrayList<VertexWritable>();
 
-  private void flushBuffer(VertexWritable iVertex,FloatWritable weightage,Context context)throws IOException,InterruptedException{
+  private void flushBuffer(VertexWritable iVertex,LongWritable weightage,Context context)throws IOException,InterruptedException{
     for(VertexWritable jVertex: buffer)
       context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),weightage);
   }
   //Input a Interable of either destination vertex or edgecount (for the given source vertex)
   public void reduce(VertexWritable iVertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
-    FloatWritable weightage = new FloatWritable();
+    LongWritable weightage = new LongWritable();
     boolean edgeCountEncountered = false;
 
     for(VertexOrCountWritable v:values){
@@ -59,7 +59,7 @@ public class MatrixBuilderReducer
       else{ //type CountWritable, we've found the count, flush the buffer
         edgeCountEncountered = true;
         CountWritable temp = (CountWritable)(v.get());
-        weightage.set(1.0f/((float)temp.get()));
+        weightage.set((long)((1.0/((float)temp.get()))*Math.pow(10,18)));
         this.flushBuffer(iVertex,weightage,context);
       }
     }

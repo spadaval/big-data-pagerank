@@ -1,8 +1,9 @@
 #!/bin/bash
 #clean up the current edgecount file
-hadoop fs -rmr /pagerank/Files/VertexCount
-
+echo "cleanup.."
+hadoop fs -rm -r /pagerank/Files/VertexCount  > /dev/null 2>&1
+echo "done"
 #run the job
-hadoop jar vertexcount.jar VertexCount
-
-hdfs dfs -get /pagerank/Files/VertexCount ./VertexCount
+echo "Running vertexcount.."
+hadoop jar vertexcount.jar VertexCount > /dev/null 2>&1
+echo "done"

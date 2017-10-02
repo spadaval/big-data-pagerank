@@ -1,4 +1,3 @@
-package vertexcount;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
@@ -12,8 +11,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-public class SumReducer
-     extends Reducer<LongWritable,LongWritable,NullWritable,LongWritable> {
+public class SumReducer extends Reducer<LongWritable,LongWritable, NullWritable, LongWritable> {
   private LongWritable result = new LongWritable();
 
   public void reduce(LongWritable key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
@@ -21,7 +19,8 @@ public class SumReducer
     for (LongWritable val : values) {
       sum += val.get();
     }
+    NullWritable n = NullWritable.get();
     result.set(sum);
-    context.write(NullWritable.get(), result);
+    context.write(n,result);
   }
 }
