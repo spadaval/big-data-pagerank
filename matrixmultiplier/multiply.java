@@ -32,7 +32,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
-public class multiply extends Configured implements Tool 
+public class multiply extends Configured implements Tool
 {
 	public static long size;
 	public static class CounterMapper extends Mapper<LongWritable, Text, Text, LongWritable>
@@ -89,11 +89,11 @@ public class multiply extends Configured implements Tool
 			long count = 0;
 			for (LongWritable val : values)
 			{
-				sum *= val.get();  
+				sum *= val.get();
 				count += 1;
 			}
 			//System.out.print("\n\n"+count+"\n\n");
-			
+
 			//System.out.print("\n\n"+size+"\n\n");
 			if(count>1)
 			{
@@ -110,10 +110,10 @@ public class multiply extends Configured implements Tool
 		 //JobConf job = new JobConf(multiply.class);
 		 Job job = Job.getInstance();
 		 job.setJarByClass(multiply.class);
-		 MultipleInputs.addInputPath(job,new Path("/Input1"),TextInputFormat.class,CounterMapper.class);
-		 MultipleInputs.addInputPath(job,new Path("/Input2"),TextInputFormat.class,CountertwoMapper.class);
-		  
-		 FileOutputFormat.setOutputPath(job, new Path("Output"));
+		 MultipleInputs.addInputPath(job,new Path("/pagerank/Output/A"),TextInputFormat.class,CounterMapper.class);
+		 MultipleInputs.addInputPath(job,new Path("/pagerank/Output/V"),TextInputFormat.class,CountertwoMapper.class);
+
+		 FileOutputFormat.setOutputPath(job, new Path("/pagerank/Files/IntermediateOutput"));
 		 job.setReducerClass(CounterReducer.class);
 		 job.setNumReduceTasks(1);
 		 job.setMapOutputKeyClass(Text.class);
@@ -121,11 +121,11 @@ public class multiply extends Configured implements Tool
 		 //job.setOutputKeyClass(Text.class);
 		 job.setOutputKeyClass(LongWritable.class);
 		 job.setOutputValueClass(LongWritable.class);
-		 
+
 		 return (job.waitForCompletion(true) ? 0 : 1);
 
 	 }
-	 
+
 
  	public static void main(String[] args) throws Exception
  	{
@@ -133,7 +133,7 @@ public class multiply extends Configured implements Tool
  		size = a;
 		int ecode = ToolRunner.run(new multiply(),args);
 		System.exit(ecode);
-		
+
 		/*
 		JobConf conf = new JobConf(multiply.class);
 		MultipleInputs.addInputPath(job,new Path("/Input1"),TextInputFormat.class,CounterMapper.class);

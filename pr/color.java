@@ -40,7 +40,7 @@ public class color
 			output.collect(new Text(k.get(0)), new LongWritable(sum));
 		}
 	}
- 	
+
 	public static void main(String[] args) throws Exception
 	{
 
@@ -52,15 +52,15 @@ public class color
 		conf.setMapperClass(Map.class);
 		conf.setCombinerClass(Reduce.class);
 		conf.setReducerClass(Reduce.class);
-		
+
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
-		
-		FileInputFormat.setInputPaths(conf, new Path("/Output1"));
-		FileOutputFormat.setOutputPath(conf, new Path("Output2"));
-		
-		
+
+		FileInputFormat.setInputPaths(conf, new Path("/pagerank/Files/IntermediateOutput"));
+		FileOutputFormat.setOutputPath(conf, new Path("/pagerank/Output/NewV"));
+
+
 		JobClient.runJob(conf);
-		
+
 	}
 }
