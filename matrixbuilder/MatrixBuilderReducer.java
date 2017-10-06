@@ -33,24 +33,26 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 public class MatrixBuilderReducer
-     extends Reducer<VertexWritable,VertexOrCountWritable,PositionPairWritable,LongWritable> {
+     extends Reducer<VertexWritable,VertexOrCountWritable,Text,FloatWritable> {
 
   private ArrayList<VertexWritable> buffer = new ArrayList<VertexWritable>();
 
-  private void flushBuffer(VertexWritable iVertex,LongWritable weightage,Context context)throws IOException,InterruptedException{
+  private void flushBuffer(VertexWritable iVertex,FloatWritable weightage,Context context)throws IOException,InterruptedException{
     for(VertexWritable jVertex: buffer)
-      context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),weightage);
+      context.write(new Text(Long.toString(jVertex.get())+" "+Long.toString(iVertex.get())),weightage);
   }
   //Input a Interable of either destination vertex or edgecount (for the given source vertex)
   public void reduce(VertexWritable iVertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
-    LongWritable weightage = new LongWritable();
+    FloatWritable weightage = new FloatWritable();
     boolean edgeCountEncountered = false;
 
     for(VertexOrCountWritable v:values){
       if(v.get() instanceof VertexWritable){
         VertexWritable jVertex = (VertexWritable)(v.get());
+        if(iVertex==jVertex)
+        	continue;
         if(edgeCountEncountered){ //normal operation, write out a pair
-          context.write(new PositionPairWritable(jVertex.get(),iVertex.get()),weightage);
+          context.write(new Text(Long.toString(jVertex.get()) + " " + Long.toString(iVertex.get())),weightage);
         }
         else{ // We don't know the weightage yet, add to a buffer
           buffer.add(jVertex);
@@ -59,7 +61,10 @@ public class MatrixBuilderReducer
       else{ //type CountWritable, we've found the count, flush the buffer
         edgeCountEncountered = true;
         CountWritable temp = (CountWritable)(v.get());
-        weightage.set((long)((1.0/((float)temp.get()))*Math.pow(10,18)));
+        weightage.set(1.0f/temp.get());
+        
+          context.write(new Text("1000 "+Long.toString(iVertex.get())),weightage);
+        
         this.flushBuffer(iVertex,weightage,context);
       }
     }

@@ -37,11 +37,15 @@ public class PositionPairWritable implements WritableComparable{
      private long i;
      private long j;
 
+
      PositionPairWritable(long i, long j){
        this.i = i;
        this.j = j;
      }
-
+     
+     PositionPairWritable(){
+     }
+     
      public void write(DataOutput out) throws IOException {
        out.writeLong(i);
        out.writeLong(j);
@@ -71,7 +75,10 @@ public class PositionPairWritable implements WritableComparable{
           return 0;
       }
      }
-
+     public void set(int i,int j){
+     	this.i = i;
+     	this.j = j;
+     }
      public int hashCode() {
        final long prime = 31;
        long result = 1;

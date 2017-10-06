@@ -40,9 +40,11 @@ public class MatrixBuilder extends Configured implements Tool{
     Job job = Job.getInstance(conf);
     job.setJarByClass(MatrixBuilder.class);
     job.setReducerClass(MatrixBuilderReducer.class);
-    job.setOutputKeyClass(VertexWritable.class);
-    job.setOutputValueClass(VertexOrCountWritable.class);
-
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(FloatWritable.class);
+    job.setMapOutputKeyClass(VertexWritable.class);
+    job.setMapOutputValueClass(VertexOrCountWritable.class);
+    
     conf.set("mapreduce.input.fileinputformat.input.dir.recursive","true");
     FileInputFormat.setInputDirRecursive(job, true);
 
