@@ -38,31 +38,19 @@ public class MatrixBuilderReducer
   private ArrayList<VertexWritable> buffer = new ArrayList<VertexWritable>();
 
   private void flushBuffer(VertexWritable iVertex,FloatWritable weightage,Context context)throws IOException,InterruptedException{
-    //context.write(new Text("Starting output buffer flush: "+Long.toString(iVertex.get())),weightage);
     
     for(VertexWritable jVertex: buffer)
       context.write(new Text(Long.toString(jVertex.get())+" "+Long.toString(iVertex.get())),weightage);
     
-    //context.write(new Text("Output buffer flushed: "+Long.toString(iVertex.get())),weightage);
   }
   //Input a Interable of either destination vertex or edgecount (for the given source vertex)
   public void reduce(VertexWritable iVertex, Iterable<VertexOrCountWritable> values, Context context) throws IOException, InterruptedException {
     FloatWritable weightage = new FloatWritable();
     boolean edgeCountEncountered = false;
     int numInputs = 0;
-    
-    context.write(new Text("begin vertex:"),new FloatWritable((float)iVertex.get()));
-    
+    buffer = new ArrayList<VertexWritable>();
+        
     for(VertexOrCountWritable v : values){
-    	if(v.get() instanceof VertexWritable)
-    	    context.write(new Text("Vertex input:"),new FloatWritable( (float)( ((VertexWritable)v.get()) .get())) ) ;
-	else
-    	    context.write(new Text("Count input:"),new FloatWritable( (float)(((CountWritable)v.get()).get())) ) ;
-
-    	
-    	
-    	
-      numInputs++;
       if(v.get() instanceof VertexWritable){
         VertexWritable jVertex = (VertexWritable)(v.get());
        if(edgeCountEncountered){ //normal operation, write out a pair
@@ -76,14 +64,10 @@ public class MatrixBuilderReducer
         edgeCountEncountered = true;
         CountWritable temp = (CountWritable)(v.get());
         weightage.set(1.0f/temp.get());
-        
-          context.write(new Text("weightage "+Long.toString(iVertex.get())),weightage);
-        
+                
         this.flushBuffer(iVertex,weightage,context);
       }
     }
     
-	context.write(new Text("Inputs received: "+Long.toString(numInputs)),new FloatWritable((float)iVertex.get()));
-
   }
 }
